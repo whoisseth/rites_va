@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +19,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={cn(inter.className, 'p-4 flex flex-col')}>
+        <div className="flex items-center gap-4 pb-4">
+
+          <Link href={'/'} className={buttonVariants({ variant: "link" })}>Home</Link>
+          <Link href={'/tasks'} className={buttonVariants({ variant: "link" })}>tasks</Link>
+          <Link href={'/profile-from'} className={buttonVariants({ variant: "link" })}>profile-from</Link>
+          <Link href={'/authentication'} className={buttonVariants({ variant: "link" })}>Sign In</Link>
+          <Link href={'/dashboard'} className={buttonVariants({ variant: "link" })}>Dashboard</Link>
+
+        </div>
+        <div>
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
