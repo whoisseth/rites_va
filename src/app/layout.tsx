@@ -30,6 +30,12 @@ export default function RootLayout({
                 Home
               </Link>
               <Link
+                href={"/users"}
+                className={buttonVariants({ variant: "link" })}
+              >
+                Users
+              </Link>
+              <Link
                 href={"/tasks"}
                 className={buttonVariants({ variant: "link" })}
               >
@@ -42,7 +48,7 @@ export default function RootLayout({
                 profile-from
               </Link>
               <Link
-                href={"/user"}
+                href={"/user-form"}
                 className={buttonVariants({ variant: "link" })}
               >
                 User From
