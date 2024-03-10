@@ -59,7 +59,7 @@ async function updateData(newData: User) {
 
 export function EditDialog(props: EditDialogProps) {
   const router = useRouter();
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false);
 
   const { mutateAsync, mutate } = useMutation({

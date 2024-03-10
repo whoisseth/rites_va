@@ -16,7 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { Delete, Edit } from "lucide-react";
 import { useState } from "react";
-import { QueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { QueryClient, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 // import { UserFormValues } from "../user-form/page";
 import { UserFormValues } from "../user-form/type";
 import { Loading } from "./components/loading";
@@ -31,9 +31,9 @@ async function deleteUser(id: string) {
 // write the update user function for api like delete u
 
 export default function TableDemo() {
-  const [currentId, setCurrentId] = useState("");
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
 
+  const [currentId, setCurrentId] = useState("");
   const { isLoading, error, data, refetch } = useQuery<User[]>({
     queryKey: ["users"],
     // refetchOnWindowFocus: true,
