@@ -1,6 +1,8 @@
 /** @format */
 
-import { connectToDb } from "@/lib/db";
+export const dynamic = 'force-dynamic'
+
+import { connectToDb, disconnectDb } from "@/lib/db";
 import { User } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,9 +11,12 @@ export async function GET(req: NextRequest) {
     await connectToDb();
 
     const UserData = await User.find();
-
-    return NextResponse.json(UserData);
+    console.log(UserData, "useradata");
+    return NextResponse.json(UserData,{status:200});
   } catch (error) {
     console.log("error fetching user data ", error);
+    return NextResponse.json(error);
+  } finally {
+    disconnectDb();
   }
 }

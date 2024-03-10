@@ -10,17 +10,17 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { Delete, Edit } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   QueryClient,
   useQuery,
   useMutation,
-  useQueryClient
+  useQueryClient,
 } from "@tanstack/react-query";
 // import { UserFormValues } from "../user-form/page";
 import { UserFormValues } from "../user-form/type";
@@ -30,7 +30,7 @@ import { User } from "./type";
 
 async function deleteUser(id: string) {
   const response = await axios.delete(`/api/user/${id}`);
-  return response.data;
+  return await response.data;
 }
 
 // write the update user function for api like delete u
@@ -41,25 +41,25 @@ export default function TableDemo() {
   const [currentId, setCurrentId] = useState("");
   const { isLoading, error, data, refetch } = useQuery<User[]>({
     queryKey: ["users"],
+    staleTime: 0, // Disable caching for this specific query
+    
     // refetchOnWindowFocus: true,
-
-    queryFn: () => fetch(`/api/user`).then((res) => res.json()),
-    // refetchOnWindowFocus: true,
-    refetchInterval: 0
+    queryFn: async () => {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_HOST_URL}/api/user`);
+      return await resp.json();
+    },
   });
-  // use useMutation for update data
 
-  //  write a fuction handleEdite
 
   const {
     mutate,
     data: deleteData,
-    isPending: isDeleteLoading
+    isPending: isDeleteLoading,
   } = useMutation({
     mutationFn: deleteUser,
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-    }
+    },
   });
 
   // const { mutate: editMutate } = useEditUser();
@@ -70,13 +70,13 @@ export default function TableDemo() {
         <div className="flex gap-1 items-center">
           <Loading /> <p>deleting...</p>
         </div>
-      )
+      ),
     });
 
-    await mutate(id);
+     mutate(id);
 
     toast({
-      description: `${deleteData}  User is Deleted .`
+      description: `${deleteData}  User is Deleted .`,
     });
     // refetch();
   }
@@ -91,7 +91,7 @@ export default function TableDemo() {
 
   return (
     <div>
-      {isLoading ? (
+      {false ? (
         <div className="h-full w-full flex items-center justify-center">
           <Loading />
         </div>
@@ -107,33 +107,35 @@ export default function TableDemo() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data
-              ? data.map((d) => (
-                  <TableRow key={d._id}>
-                    <TableCell className="font-medium">{d.name}</TableCell>
-                    <TableCell>{d.description}</TableCell>
-                    <TableCell>
-                      {/* <Edit /> */}
-                      <EditDialog data={d} />
-                    </TableCell>
-                    <TableCell className="">
-                      {isDeleteLoading && d._id == currentId ? (
-                        <Loading />
-                      ) : (
-                        <Button
-                          onClick={() => {
-                            handleDelete(d._id);
-                            setCurrentId(d._id);
-                          }}
-                          variant="outline"
-                        >
-                          <Delete className="text-red-400 cursor-pointer" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-              : null}
+            {data !== undefined && data?.length > 0 ? (
+              data.map((d) => (
+                <TableRow key={d._id}>
+                  <TableCell className="font-medium">{d.name}</TableCell>
+                  <TableCell>{d.description}</TableCell>
+                  <TableCell>
+                    {/* <Edit /> */}
+                    <EditDialog data={d} />
+                  </TableCell>
+                  <TableCell className="">
+                    {isDeleteLoading && d._id == currentId ? (
+                      <Loading />
+                    ) : (
+                      <Button
+                        onClick={() => {
+                          handleDelete(d._id);
+                          setCurrentId(d._id);
+                        }}
+                        variant="outline"
+                      >
+                        <Delete className="text-red-400 cursor-pointer" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <p>{data?.length} here</p>
+            )}
           </TableBody>
         </Table>
       )}

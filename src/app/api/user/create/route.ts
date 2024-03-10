@@ -1,6 +1,6 @@
 /** @format */
 
-import { connectToDb } from "@/lib/db";
+import { connectToDb, disconnectDb } from "@/lib/db";
 import { User } from "@/models/User";
 import { VA_Detail } from "@/models/VA_Details";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -11,6 +11,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     //
+
+    await connectToDb()
+    
     const reqBody = await request.json();
     const { name, description } = reqBody;
 
@@ -30,5 +33,8 @@ export async function POST(request: NextRequest) {
     //
   } catch (err) {
     console.log(err);
+    return NextResponse.json(err);
+  } finally{
+    disconnectDb()
   }
 }
