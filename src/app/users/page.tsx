@@ -39,7 +39,7 @@ export default function TableDemo() {
     // refetchOnWindowFocus: true,
 
     queryFn: () =>
-      fetch(`${process.env.NEXT_PUBLIC_HOST_URL}/api/user`).then((res) =>
+      fetch(`/api/user`).then((res) =>
         res.json()
       )
   });
