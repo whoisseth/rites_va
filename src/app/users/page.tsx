@@ -44,7 +44,8 @@ export default function TableDemo() {
     // refetchOnWindowFocus: true,
 
     queryFn: () => fetch(`/api/user`).then((res) => res.json()),
-    refetchOnWindowFocus: true
+    // refetchOnWindowFocus: true,
+    refetchInterval: 0
   });
   // use useMutation for update data
 
