@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -14,85 +16,49 @@ import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { Delete, Edit } from "lucide-react";
 import { useState } from "react";
-import { useQuery } from "react-query";
-import { useMutation } from "react-query";
-
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card"
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal"
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer"
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card"
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal"
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer"
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card"
-  }
-];
-
-interface User {
-  _id: string;
-  name: string;
-  description: string;
-}
+import { QueryClient, useQuery, useMutation } from "@tanstack/react-query";
+// import { UserFormValues } from "../user-form/page";
+import { UserFormValues } from "../user-form/type";
+import { Loading } from "./components/loading";
+import { EditDialog } from "./components/edit-dialog";
+import { User } from "./type";
 
 async function deleteUser(id: string) {
   const response = await axios.delete(`/api/user/${id}`);
   return response.data;
 }
 
-function useDeletePost() {
-  return useMutation(deleteUser);
-}
+// write the update user function for api like delete u
 
 export default function TableDemo() {
   const [currentId, setCurrentId] = useState("");
-
-  const {
-    mutateAsync,
-    data: deleteData,
-    isLoading: isDeleteLoading
-  } = useDeletePost();
+  const queryClient = new QueryClient();
 
   const { isLoading, error, data, refetch } = useQuery<User[]>({
-    queryKey: ["userData"],
+    queryKey: ["users"],
+    // refetchOnWindowFocus: true,
+
     queryFn: () =>
       fetch(`${process.env.NEXT_PUBLIC_HOST_URL}/api/user`).then((res) =>
         res.json()
       )
   });
+  // use useMutation for update data
+
+  //  write a fuction handleEdite
+
+  const {
+    mutate,
+    data: deleteData,
+    isPending: isDeleteLoading
+  } = useMutation({
+    mutationFn: deleteUser,
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    }
+  });
+
+  // const { mutate: editMutate } = useEditUser();
 
   async function handleDelete(id: string) {
     toast({
@@ -103,13 +69,21 @@ export default function TableDemo() {
       )
     });
 
-    await mutateAsync(id);
+    await mutate(id);
 
     toast({
       description: `${deleteData}  User is Deleted .`
     });
-    refetch();
+    // refetch();
   }
+
+  // write a function to handle edit user
+  //     await editMutateAsync();
+
+  // async function handleEdit(id: string, data: UserFormValues) {
+  // wriete the logic for edite
+  //  }
+  // }
 
   return (
     <div>
@@ -135,19 +109,22 @@ export default function TableDemo() {
                     <TableCell className="font-medium">{d.name}</TableCell>
                     <TableCell>{d.description}</TableCell>
                     <TableCell>
-                      <Edit />
+                      {/* <Edit /> */}
+                      <EditDialog data={d} />
                     </TableCell>
                     <TableCell className="">
                       {isDeleteLoading && d._id == currentId ? (
                         <Loading />
                       ) : (
-                        <Delete
+                        <Button
                           onClick={() => {
                             handleDelete(d._id);
                             setCurrentId(d._id);
                           }}
-                          className="text-red-400 cursor-pointer"
-                        />
+                          variant="outline"
+                        >
+                          <Delete className="text-red-400 cursor-pointer" />
+                        </Button>
                       )}
                     </TableCell>
                   </TableRow>
@@ -156,30 +133,6 @@ export default function TableDemo() {
           </TableBody>
         </Table>
       )}
-    </div>
-  );
-}
-
-function Loading() {
-  return (
-    <div role="status">
-      <svg
-        aria-hidden="true"
-        className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-        viewBox="0 0 100 101"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-          fill="currentColor"
-        />
-        <path
-          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-          fill="currentFill"
-        />
-      </svg>
-      <span className="sr-only">Loading...</span>
     </div>
   );
 }

@@ -1,11 +1,7 @@
-/** @format */
-
 "use client";
 
-import Link from "next/link";
-import DatePickerDemo from "@/date-picker";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { cn } from "@/lib/utils";
@@ -13,34 +9,18 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+
 import { toast } from "@/components/ui/use-toast";
 
 import axios from "axios";
-import { useMutation, useQueryClient } from "react-query";
-
-const userFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "name must be at least 2 characters."
-  }),
-  description: z.string()
-});
-
-type UserFormValues = z.infer<typeof userFormSchema>;
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UserFormValues, userFormSchema } from "./type";
 
 // This can come from your database or API.
 const defaultValues: Partial<UserFormValues> = {
@@ -64,25 +44,18 @@ export default function ProfileForm() {
     defaultValues,
     mode: "onChange"
   });
-  const { mutate, isLoading } = useMutation(createUser, {
-    onSuccess: (data) => {
-      const message = "success";
-      //   alert(message);
-      console.log(message);
-    },
-    onError: () => {
-      alert("there was an error");
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries("create");
+
+  const mutation = useMutation({
+    mutationFn: (newTodo) => {
+      return axios.post("/todos", newTodo);
     }
   });
-  //   const onSubmit = (data: Employee) => {
-  //     const employee = {
-  //       ...data
-  //     };
-  //     mutate(employee);
-  //   };
+  const { mutate } = useMutation({
+    mutationFn: createUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    }
+  });
 
   function onSubmit(data: UserFormValues) {
     mutate(data);

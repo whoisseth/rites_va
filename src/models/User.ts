@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 
 // Vendor Assesment
 export interface User {
-  _id?: string; // Optional for existing items
+  _id: string; // Optional for existing items
   name: string;
   description?: string;
   // Add other fields and their types
