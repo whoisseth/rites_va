@@ -2,10 +2,9 @@
 
 import { connectToDb } from "@/lib/db";
 import { User } from "@/models/User";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
     await connectToDb();
 

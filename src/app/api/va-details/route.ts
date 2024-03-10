@@ -17,7 +17,7 @@ import { NextRequest, NextResponse } from "next/server";
 //     console.log("error fetching attendance ", error);
 //   }
 // }
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
     await connectToDb();
 
