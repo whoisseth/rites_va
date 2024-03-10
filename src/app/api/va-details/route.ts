@@ -1,9 +1,8 @@
 /** @format */
 
-import { connectToDb } from "@/lib/db";
+import { connectToDb, disconnectDb } from "@/lib/db";
 import { User } from "@/models/User";
 import { VA_Detail } from "@/models/VA_Details";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
 // export async function GET(req: NextApiRequest) {
@@ -17,15 +16,18 @@ import { NextRequest, NextResponse } from "next/server";
 //     console.log("error fetching attendance ", error);
 //   }
 // }
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
     await connectToDb();
 
     const VA_DetailData = await User.find();
-
+    console.table(VA_Detail);
     return NextResponse.json(VA_DetailData);
   } catch (error) {
     console.log("error fetching attendance ", error);
+  }
+  finally{
+    disconnectDb()
   }
 }
 
@@ -37,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const newUser = new User({
       name,
-      description
+      description,
     });
 
     const savedUser = await newUser.save();
@@ -45,11 +47,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: "User created successfully",
       sucess: true,
-      savedUser
+      savedUser,
     });
 
     //
   } catch (err) {
     console.log(err);
+  } finally{
+    disconnectDb()
   }
 }

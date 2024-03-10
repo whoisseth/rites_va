@@ -1,13 +1,12 @@
 /** @format */
 
-import { connectToDb } from "@/lib/db";
+import { connectToDb, disconnectDb } from "@/lib/db";
 import { User } from "@/models/User";
 import { HttpStatusCode } from "axios";
-import { NextApiRequest, NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
-  req: NextApiRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -28,6 +27,8 @@ export async function DELETE(
       { message: error },
       { status: HttpStatusCode.BadRequest }
     );
+  } finally{
+    disconnectDb()
   }
 }
 
@@ -55,5 +56,7 @@ export async function PUT(
       { message: error },
       { status: HttpStatusCode.BadRequest }
     );
+  } finally{
+    disconnectDb()
   }
 }
