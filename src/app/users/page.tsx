@@ -16,7 +16,12 @@ import { toast } from "@/components/ui/use-toast";
 import axios from "axios";
 import { Delete, Edit } from "lucide-react";
 import { useState } from "react";
-import { QueryClient, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useQuery,
+  useMutation,
+  useQueryClient
+} from "@tanstack/react-query";
 // import { UserFormValues } from "../user-form/page";
 import { UserFormValues } from "../user-form/type";
 import { Loading } from "./components/loading";
@@ -38,10 +43,8 @@ export default function TableDemo() {
     queryKey: ["users"],
     // refetchOnWindowFocus: true,
 
-    queryFn: () =>
-      fetch(`/api/user`).then((res) =>
-        res.json()
-      )
+    queryFn: () => fetch(`/api/user`).then((res) => res.json()),
+    refetchOnWindowFocus: true
   });
   // use useMutation for update data
 
